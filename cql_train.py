@@ -15,8 +15,10 @@ from tianshou.policy.base import BasePolicy
 from tianshou.trainer import OfflineTrainer
 from tianshou.utils import TensorboardLogger
 from tianshou.utils.space_info import SpaceInfo
-
 import cellworld_gym as cwg
+
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def get_args() -> argparse.Namespace:
@@ -98,15 +100,12 @@ def get_args() -> argparse.Namespace:
 
 
 def test_cql() -> None:
-    import warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
     args = get_args()
     env = gym.make(args.task,
                    world_name="21_05",
                    use_lppos=False,
                    use_predator=True,
-                   max_step = 30,
+                   max_step = 300,
                    time_step = 0.25,
                    reward_function=cwg.Reward({"puffed": -100, "finished": 10}))
     assert isinstance(env.action_space, gym.spaces.Discrete), "only discrete action space is supported"
@@ -130,7 +129,7 @@ def test_cql() -> None:
                          world_name="21_05",
                          use_lppos=False,
                          use_predator=True,
-                         max_step=30,
+                         max_step=300,
                          time_step=0.25,
                          reward_function=cwg.Reward({"puffed": -100, "finished": 10}))
         for _ in range(args.test_num)
@@ -212,6 +211,76 @@ def test_cql() -> None:
     ).run()
     pprint.pprint(result)
 
+def eval_cql():
+    args = get_args()
+    env = gym.make(args.task,
+                   world_name="21_05",
+                   use_lppos=False,
+                   use_predator=True,
+                   max_step=300,
+                   time_step=0.25,
+                   reward_function=cwg.Reward({"puffed": -100, "finished": 10}))
+    assert isinstance(env.action_space, gym.spaces.Discrete), "only discrete action space is supported"
+    space_info = SpaceInfo.from_env(env)
+    args.state_shape = space_info.observation_info.obs_shape
+    args.action_shape = space_info.action_info.action_shape
+    args.max_action = space_info.action_info.max_action
+    args.min_action = space_info.action_info.min_action
+    print("device:", args.device)
+    print("Observations shape:", args.state_shape)
+    print("Actions shape:", args.action_shape)
+    print("Action range:", args.min_action, args.max_action)
+
+    args.state_dim = space_info.observation_info.obs_dim
+    args.action_dim = space_info.action_info.action_dim
+    print("Max_action", args.max_action)
+
+    net = QRDQN(
+        obs_dim=args.state_dim,
+        action_shape=args.action_shape,
+        num_quantiles=args.num_quantiles,
+        device=args.device,
+    )
+    optim = torch.optim.Adam(net.parameters(), lr=args.lr)
+    policy: DiscreteCQLPolicy = DiscreteCQLPolicy(
+        model=net,
+        optim=optim,
+        action_space=env.action_space,
+        discount_factor=args.gamma,
+        num_quantiles=args.num_quantiles,
+        estimation_step=args.n_step,
+        target_update_freq=args.target_update_freq,
+        min_q_weight=args.min_q_weight,
+    ).to(args.device)
+
+
+    # Create the environment
+    eval_envs = gym.make(args.task,
+                   world_name="21_05",
+                   use_lppos=False,
+                   use_predator=True,
+                   max_step=300,
+                   time_step=0.25,
+                   render=True,
+                   real_time=True,
+                   reward_function=cwg.Reward({"puffed": -100, "finished": 10}))
+
+    # Create a collector for evaluation
+    eval_collector = Collector(policy, eval_envs)
+
+    # def watch() -> None:
+    #     policy.load_state_dict(
+    #         torch.load("log/CellworldBotEvade-v0/cql/240428-193814/policy.pth", map_location=args.device))
+    #     policy.eval()
+    #     collector = Collector(policy, env)
+
+    policy.load_state_dict(
+        torch.load("log/CellworldBotEvade-v0/cql/240428-193814/policy.pth", map_location=args.device))
+    policy.eval()
+    eval_collector.reset()
+    collector_stats = eval_collector.collect(n_episode=args.test_num, render=False)
+    print(collector_stats)
 
 if __name__ == "__main__":
-    test_cql()
+    # test_cql()
+    eval_cql()
