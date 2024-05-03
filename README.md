@@ -14,14 +14,13 @@ We have 100,000:
 evaluate for 100 epches, when captured -1, when success 1
 - BC: -17.42
 
-![image](https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/42aee248-361e-42ea-a8c4-e2b2076e9a91)
-![image](https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/dc1bf26f-8599-4666-a1d5-e7b2d1a27ae6)
-
 - CQL: -150.08
 
 - IQL: -29.06
 
-![image](https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/2415147b-ee9b-42a4-9d33-c0e6890f0efe)
+<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/343b4406-f617-4ffd-a1e8-d7892f7fdc38">
+<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/a107acf6-4fdb-4627-ba8f-2e3f2082e3e8">
+<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/02d8b339-e903-46bf-a484-7e6d981d4f0b">
 
 
 
