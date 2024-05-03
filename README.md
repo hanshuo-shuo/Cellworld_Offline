@@ -18,12 +18,16 @@ evaluate for 100 epches, when captured -1, when success 1
 
 - IQL: -29.06
 
-<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/343b4406-f617-4ffd-a1e8-d7892f7fdc38">
-<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/a107acf6-4fdb-4627-ba8f-2e3f2082e3e8">
-<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/02d8b339-e903-46bf-a484-7e6d981d4f0b">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/343b4406-f617-4ffd-a1e8-d7892f7fdc38">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/a107acf6-4fdb-4627-ba8f-2e3f2082e3e8">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/02d8b339-e903-46bf-a484-7e6d981d4f0b">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bb9c8853-9610-4bd6-8cc0-fae8bbca7c2f">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/48a74248-c6a2-4f78-a7a3-8fdeb49ebd97">
 
 
 
 KL divergence()
-7.569894318469576e-07 for IQL
-KL Divergence: 1.4248751999871712e-07 for BC
+- 7.569894318469576e-07 for IQL
+- 1.4248751999871712e-07 for BC
+- DQN: 1.1685386452255908
+- QRDQN: 1.1869605695309853
