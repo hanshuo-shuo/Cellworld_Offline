@@ -10,6 +10,7 @@ from agent import IQL
 from torch.utils.data import DataLoader, TensorDataset
 import pickle
 import cellworld_gym as cwg
+from video import save_video_output
 def get_config():
     parser = argparse.ArgumentParser(description='RL_IQL')
     parser.add_argument("--run_name", type=str, default="IQL-discrete", help="Run name")
@@ -107,7 +108,35 @@ def train(config):
         if i % config.save_every == 0:
             save(config, save_name="IQL", model=agent.actor_local)
 
+def evaluate_after_train(eval_runs=5):
+    env = gym.make("CellworldBotEvade-v0",
+                world_name="21_05",
+                use_lppos=False,
+                use_predator=True,
+                max_step=300,
+                time_step=0.25,
+                render=True,
+                real_time=False,
+                reward_function=cwg.Reward({"puffed": -1, "finished": 1}))
+    reward_batch = []
+    agent = IQL(state_size=env.observation_space.shape[0],
+                action_size=env.action_space.n,
+                device="cpu")
+    agent.actor_local.eval()
+    agent.actor_local.load_state_dict(torch.load("IQL_trained_models/IQL-discreteIQL.pth"))
+    for i in range(eval_runs):
+        state, _ = env.reset()
+        rewards = 0
+        while True:
+            action = agent.get_action(state, eval=True)
+            state, reward, done, tr, _ = env.step(action)
+            rewards += reward
+            if (done or tr):
+                break
+        reward_batch.append(rewards)
+    print(reward_batch)
 
 if __name__ == "__main__":
-    config = get_config()
-    train(config)
+    # config = get_config()
+    # train(config)
+    evaluate_after_train()
