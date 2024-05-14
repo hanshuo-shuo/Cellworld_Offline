@@ -59,8 +59,10 @@ class IQL(nn.Module):
     def calc_policy_loss(self, states, actions):
         with torch.no_grad():
             v = self.value_net(states)
+            # Calculate the expected Q-values for the current states using the critic networks (critic1 and critic2).
             q1 = self.critic1_target(states).gather(1, actions.long())
             q2 = self.critic2_target(states).gather(1, actions.long())
+            # address the overestimation bias and to stabilize training
             min_Q = torch.min(q1, q2)
 
         exp_a = torch.exp((min_Q - v) * self.temperature)
@@ -87,6 +89,7 @@ class IQL(nn.Module):
             next_v = self.value_net(next_states)
             q_target = rewards + (self.gamma * (1 - dones) * next_v)
 
+        # Calculate the Predicted Q-Values for the current states using the critic networks (critic1 and critic2).
         q1 = self.critic1(states).gather(1, actions.long())
         q2 = self.critic2(states).gather(1, actions.long())
         critic1_loss = ((q1 - q_target) ** 2).mean()
@@ -127,10 +130,15 @@ class IQL(nn.Module):
 
         return actor_loss.item(), critic1_loss.item(), critic2_loss.item(), value_loss.item()
 
+
+    # Use for algorithms needing very stable targets over multiple steps.
+    # Adjust the update frequency based on your stability and convergence needs.
     def hard_update(self, local_model, target_model):
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(local_param.data)
 
+    # ensure that the target network gradually tracks the updates in the main network,
+    # which can help in faster convergence by keeping the targets more current.
     def soft_update(self, local_model, target_model):
         """Soft update model parameters.
         θ_target = τ*θ_local + (1 - τ)*θ_target
