@@ -3,14 +3,14 @@ import numpy as np
 from collections import deque
 import torch
 import argparse
-from iql_buffer import ReplayBuffer
-import glob
+from cellworld import World, World_statistics
 from utils import save, collect_random
 from agent import IQL
 from torch.utils.data import DataLoader, TensorDataset
 import pickle
 import cellworld_gym as cwg
 from video import save_video_output
+
 def get_config():
     parser = argparse.ArgumentParser(description='RL_IQL')
     parser.add_argument("--run_name", type=str, default="IQL-discrete", help="Run name")
@@ -59,6 +59,49 @@ def prep_dataloader(batch_size=256, size=100_000):
     dataloader = DataLoader(tensordata, batch_size=batch_size, shuffle=True)
     return dataloader
 
+def get_importance_states()->list:
+    world = World.get_from_parameters_names("hexagonal", "canonical", "21_05")
+    world_statistics = World_statistics.get_from_parameters_names("hexagonal", "21_05")
+    m = max(world_statistics.visual_centrality_derivative)
+    v = [1 if p > m * .1 else 0 for p in world_statistics.visual_centrality_derivative]
+    world_statistics = World_statistics.get_from_parameters_names("hexagonal", "21_05")
+    m = max(world_statistics.visual_centrality_derivative)
+    v = [1 if p > m * .1 else 0 for p in world_statistics.visual_centrality_derivative]
+    # get the locations for high central derivative
+    locations = list()
+    for cell_id, p in enumerate(v):
+        if p == 1:
+            l = world.cells[cell_id].location
+            locations.append((l.x, l.y))
+    return locations
+
+
+def prep_dataloader_hc(batch_size=256):
+    tensors = {}
+    with open("new_data.pkl", 'rb') as f:
+    # with open("new_data_real.pkl", 'rb') as f:
+        custom_buffer = pickle.load(f)
+        print(custom_buffer['observations'].shape)
+    obs_list = custom_buffer['observations']
+    act_list = custom_buffer['actions']
+    reward_list = custom_buffer['rewards']
+    reward_list[reward_list == -100] = -1
+    reward_list[reward_list == 10] = 1
+    next_obs_list = custom_buffer['next_observations']
+    done_list = custom_buffer['dones']
+    tensors["observations"] = torch.from_numpy(obs_list).float()
+    tensors["actions"] = torch.from_numpy(act_list).float()
+    tensors["rewards"] = torch.from_numpy(reward_list).float()
+    tensors["next_observations"] = torch.from_numpy(next_obs_list).float()
+    tensors["dones"] = torch.from_numpy(done_list).long()
+    tensordata = TensorDataset(tensors["observations"],
+                               tensors["actions"],
+                               tensors["rewards"],
+                               tensors["next_observations"],
+                               tensors["dones"])
+    dataloader = DataLoader(tensordata, batch_size=batch_size, shuffle=True)
+    return dataloader
+
 def evaluate(env, policy, eval_runs=10):
     reward_batch = []
     for i in range(eval_runs):
@@ -86,8 +129,8 @@ def train(config):
              real_time=False,
              reward_function=cwg.Reward({"puffed": -1, "finished": 1}))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dataloader = prep_dataloader(batch_size=config.batch_size)
-
+    # dataloader = prep_dataloader(batch_size=config.batch_size)
+    dataloader = prep_dataloader_hc(batch_size=config.batch_size)
     batches = 0
     average10 = deque(maxlen=10)
 
@@ -154,7 +197,56 @@ def evaluate_after_train(eval_runs=100):
         reward_batch.append(rewards)
     print(np.mean(reward_batch))
 
+def kl_divergence():
+    from scipy.stats import entropy
+    with open('first_try.pkl', 'rb') as file:
+        replay_buffer = pickle.load(file)
+
+    observations_for_action = replay_buffer.observations.squeeze(axis=1)[:100000]
+    real_actions = replay_buffer.actions.squeeze(axis=1)[:100000]
+    #get the actions from the model
+    env = gym.make("CellworldBotEvade-v0",
+                   world_name="21_05",
+                   use_lppos=False,
+                   use_predator=True,
+                   max_step=300,
+                   time_step=0.25,
+                   render=False,
+                   real_time=False,
+                   reward_function=cwg.Reward({"puffed": -1, "finished": 1}))
+    agent = IQL(state_size=env.observation_space.shape[0],
+                action_size=env.action_space.n,
+                device="cpu")
+    agent.actor_local.eval()
+    agent.actor_local.load_state_dict(torch.load("IQL_trained_models/IQL-discreteIQL_400.pth"))
+    predicted_action = agent.get_action(observations_for_action, eval=True)
+    ## get the probabilities of the actions
+    actions = np.array(predicted_action)
+    unique_actions, action_counts = np.unique(actions, return_counts=True)
+    total_actions = len(actions)
+    action_probabilities = action_counts / total_actions
+    ## get the probabilities of the real actions
+    real_actions = np.array(real_actions)
+    unique_real_actions, real_action_counts = np.unique(real_actions, return_counts=True)
+    total_real_actions = len(real_actions)
+    real_action_probabilities = real_action_counts / total_real_actions
+    # transform the probabilities to the exp-probabilities
+    real_action_probabilities = np.exp(real_action_probabilities)/np.sum(np.exp(real_action_probabilities))
+    action_probabilities = np.exp(action_probabilities)/np.sum(np.exp(action_probabilities))
+    kl_div = entropy(real_action_probabilities, action_probabilities)
+    print(kl_div)
+
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10, 6))
+    plt.hist(predicted_action, bins=50, color='blue', alpha=0.7)
+    plt.title('Trained Actions IQL')
+    plt.xlabel('Action')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()
+
 if __name__ == "__main__":
-    # config = get_config()
-    # train(config)
-    evaluate_after_train()
+    config = get_config()
+    train(config)
+    # evaluate_after_train()
+    # kl_divergence()
