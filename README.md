@@ -33,3 +33,9 @@ KL divergence()
 - DQN: 1.1685386452255908
 - QRDQN: 1.1869605695309853
 - Dreamer-v3: 1.1931324363223705
+
+
+
+## Improving Offline Learning
+
+<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/45864462-5483-4373-bd1d-d0fd5a8582ee">
