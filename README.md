@@ -40,3 +40,8 @@ KL divergence()
 
 <img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/b2aeea05-a0bc-4b06-b8b6-daae5bbea07c">
 <img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/45864462-5483-4373-bd1d-d0fd5a8582ee">
+<img width="300" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bbfc7678-ba84-4b33-ab0b-a8bf374b46ca">
+
+## Offline RL Implementation with Planner-Greedy Exploration
+
+There is a planning rate and RL rate. At the starting point, the planning rate is 100% and the RL rate is 0%. And we are using the offline RL methods such as BC or Implict Q learning. During the training process, we are gradually reducing the planing rate and move the agent completely to RL based.
