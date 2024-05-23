@@ -43,7 +43,7 @@ KL divergence()
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bbfc7678-ba84-4b33-ab0b-a8bf374b46ca">
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/c19a948d-81e1-423c-a29f-6e6ef821b0e3">
 
-<img width="1000" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/c1488435-0eda-415c-85a6-3cb97d774e21">
+<img width="1000" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/2eec2f26-90d1-41ad-9136-2f519fbcf631">
 
 
 ## Offline RL Implementation with Planner-Greedy Exploration
