@@ -38,6 +38,9 @@ KL divergence()
 
 ## Improving Offline Learning
 
+<img width="1000" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/4935fb55-250f-4e6f-a4e6-2b4a5a17986f">
+
+
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/b2aeea05-a0bc-4b06-b8b6-daae5bbea07c">
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/45864462-5483-4373-bd1d-d0fd5a8582ee">
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bbfc7678-ba84-4b33-ab0b-a8bf374b46ca">
