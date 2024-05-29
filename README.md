@@ -33,3 +33,50 @@ KL divergence()
 - DQN: 1.1685386452255908
 - QRDQN: 1.1869605695309853
 - Dreamer-v3: 1.1931324363223705
+
+
+
+## Improving Offline Learning
+
+<img width="1000" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/4935fb55-250f-4e6f-a4e6-2b4a5a17986f">
+
+
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/b2aeea05-a0bc-4b06-b8b6-daae5bbea07c">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/45864462-5483-4373-bd1d-d0fd5a8582ee">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bbfc7678-ba84-4b33-ab0b-a8bf374b46ca">
+<img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/c19a948d-81e1-423c-a29f-6e6ef821b0e3">
+
+<img width="1000" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/2eec2f26-90d1-41ad-9136-2f519fbcf631">
+
+
+## Offline RL Implementation with Planner-Greedy Exploration
+
+- There is a planning rate and RL rate. At the starting point, the planning rate is 100% and the RL rate is 0%. 
+
+- And we are using the offline RL methods such as BC or Implict Q learning. During the training process, we are gradually reducing the planing rate and move the agent completely to RL based.
+
+- A mechnism to reduce the planning rate: Most simple one--linear decay, exponential decay. Performance based decay.
+
+```
+initial_planning_rate = 1.0
+final_planning_rate = 0.0
+planning_rate: form initial_planning_rate -> final_planning_rate
+
+## initilized the buffer with tlppo tractories
+replay_buffer = collet_start_data(data_points = 10000)
+
+# train
+for episode in range(total_episodes):
+    state, _ = env.reset()
+    done = False
+    while not done:
+        if random.uniform(0, 1) < planning_rate:
+            action = tlppo.(state)
+        else:
+            action = offline_rl(state)
+        next_state, reward, done, _ = env.step(action)
+        # here, when saving all transitions, should I save all transitions or only the planner's transition?
+        replay_buffer.add((state, action, reward, next_state, done))
+        state = next_state
+    offline_rl_agent.train(replay_buffer)
+```
