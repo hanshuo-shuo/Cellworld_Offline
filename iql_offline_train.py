@@ -15,11 +15,11 @@ def get_config():
     parser = argparse.ArgumentParser(description='RL_IQL')
     parser.add_argument("--run_name", type=str, default="IQL-discrete", help="Run name")
     parser.add_argument("--env", type=str, default="CartPole-v0", help="Gym environment name, default: Pendulum-v0")
-    parser.add_argument("--episodes", type=int, default=500, help="Number of episodes, default: 100")
+    parser.add_argument("--episodes", type=int, default=100, help="Number of episodes, default: 100")
     parser.add_argument("--seed", type=int, default=1, help="Seed, default: 1")
     parser.add_argument("--save_every", type=int, default=100, help="Saves the network every x epochs, default: 25")
     parser.add_argument("--batch_size", type=int, default=256, help="Batch size, default: 256")
-    parser.add_argument("--eval_every", type=int, default=10, help="Evaluate every x episodes, default: 10")
+    parser.add_argument("--eval_every", type=int, default=1, help="Evaluate every x episodes, default: 10")
     args = parser.parse_args()
     return args
 
@@ -76,12 +76,14 @@ def get_importance_states()->list:
     return locations
 
 
-def prep_dataloader_hc(batch_size=256):
+def prep_dataloader_hc(batch_size=256, data_id: int = 1):
+    print("Loading data from data_id: ", data_id)
     tensors = {}
-    with open("new_data.pkl", 'rb') as f:
+    # with open("new_data.pkl", 'rb') as f:
     # with open("new_data_real.pkl", 'rb') as f:
+    with open(f"data/new_data_{data_id}.pkl", 'rb') as f:
         custom_buffer = pickle.load(f)
-        print(custom_buffer['observations'].shape)
+        print("Data loaded and it has shape of:", custom_buffer['observations'].shape)
     obs_list = custom_buffer['observations']
     act_list = custom_buffer['actions']
     reward_list = custom_buffer['rewards']
@@ -116,7 +118,7 @@ def evaluate(env, policy, eval_runs=10):
         reward_batch.append(rewards)
     return np.mean(reward_batch)
 
-def train(config):
+def train_single_data(config, train_times=5):
     rewards_list = []
     policy_losses_list = []
     env = gym.make("CellworldBotEvade-v0",
@@ -129,7 +131,7 @@ def train(config):
              real_time=False,
              reward_function=cwg.Reward({"puffed": -1, "finished": 1}))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # dataloader = prep_dataloader(batch_size=config.batch_size)
+    # # dataloader = prep_dataloader(batch_size=config.batch_size)
     dataloader = prep_dataloader_hc(batch_size=config.batch_size)
     batches = 0
     average10 = deque(maxlen=10)
@@ -137,37 +139,108 @@ def train(config):
     agent = IQL(state_size=env.observation_space.shape[0],
                 action_size=env.action_space.n,
                 device=device)
-    for i in range(1, config.episodes+1):
-        for batch_idx, (states, actions, rewards, next_states, dones) in enumerate(dataloader):
-            states = states.to(device)
-            actions = actions.to(device)
-            rewards = rewards.to(device)
-            next_states = next_states.to(device)
-            dones = dones.to(device)
-            policy_loss, critic1_loss, critic2_loss, value_loss = agent.learn((states, actions, rewards, next_states, dones))
-            batches += 1
-        if i % config.eval_every == 0:
-            eval_reward = evaluate(env, agent)
-            average10.append(eval_reward)
-            rewards_list.append(eval_reward)
-            policy_losses_list.append(policy_loss)
-            print("Episode: {} | Reward: {} | Polciy Loss: {} | Batches: {}".format(i, eval_reward, policy_loss, batches))
-        if i % config.save_every == 0:
-            save(config, save_name="IQL_400", model=agent.actor_local)
+    for t in range(train_times):
+        # set torch seed for different initializations for different runs
+        torch.manual_seed(123+t)
+        for i in range(1, config.episodes+1):
+            for batch_idx, (states, actions, rewards, next_states, dones) in enumerate(dataloader):
+                states = states.to(device)
+                actions = actions.to(device)
+                rewards = rewards.to(device)
+                next_states = next_states.to(device)
+                dones = dones.to(device)
+                policy_loss, critic1_loss, critic2_loss, value_loss = agent.learn((states, actions, rewards, next_states, dones))
+                batches += 1
+            if i % config.eval_every == 0:
+                eval_reward = evaluate(env, agent, eval_runs=1)
+                average10.append(eval_reward)
+                rewards_list.append(eval_reward)
+                policy_losses_list.append(policy_loss)
+                print("Episode: {} | Reward: {} | Polciy Loss: {} | Batches: {}".format(i, eval_reward, policy_loss, batches))
+            if i % config.save_every == 0:
+                save(config, save_name=f"IQL_buffer_1_{t}", model=agent.actor_local)
         # plot and save plot
         import matplotlib.pyplot as plt
         plt.plot(rewards_list)
         plt.xlabel('Episode')
         plt.ylabel('Reward')
         plt.title('Reward over Episodes')
-        plt.savefig('reward_plot.png')
+        plt.savefig(f'reward_plot1{t}.png')
         plt.close()
         plt.plot(policy_losses_list)
         plt.xlabel('Episode')
         plt.ylabel('Policy Loss')
         plt.title('Policy Loss over Episodes')
-        plt.savefig('policy_loss_plot.png')
+        plt.savefig(f'policy_loss_plot{t}.png')
         plt.close()
+        # save the rewards list
+        np.save(f"rewards_list_1{t}.npy", rewards_list)
+
+def train_all_data(config, train_times=4, num_data=5):
+    env = gym.make("CellworldBotEvade-v0",
+             world_name="21_05",
+             use_lppos=False,
+             use_predator=True,
+             max_step=300,
+             time_step=0.25,
+             render=False,
+             real_time=False,
+             reward_function=cwg.Reward({"puffed": -1, "finished": 1}))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # # dataloader = prep_dataloader(batch_size=config.batch_size)
+    # dataloader = prep_dataloader_hc(batch_size=config.batch_size)
+    batches = 0
+    average10 = deque(maxlen=10)
+
+    for d in range(1, num_data+1):
+        dataloader = prep_dataloader_hc(batch_size=config.batch_size, data_id=d)
+        for t in range(1, train_times+1):
+            # set torch seed for different initializations for different runs
+            rewards_list = []
+            policy_losses_list = []
+            torch.manual_seed(123+t)
+            # create a new agent for each training time
+            agent = IQL(state_size=env.observation_space.shape[0],
+                        action_size=env.action_space.n,
+                        device=device,
+                        learning_rate=0.0001,
+                        hidden_size=256)
+            # show progress bar
+            import tqdm
+            for i in tqdm.tqdm(range(1, config.episodes+1)):
+                # create a new agent for each episode
+                for batch_idx, (states, actions, rewards, next_states, dones) in enumerate(dataloader):
+                    states = states.to(device)
+                    actions = actions.to(device)
+                    rewards = rewards.to(device)
+                    next_states = next_states.to(device)
+                    dones = dones.to(device)
+                    policy_loss, critic1_loss, critic2_loss, value_loss = agent.learn((states, actions, rewards, next_states, dones))
+                    batches += 1
+                if i % config.eval_every == 0:
+                    eval_reward = evaluate(env, agent, eval_runs=20)
+                    average10.append(eval_reward)
+                    rewards_list.append(eval_reward)
+                    policy_losses_list.append(policy_loss)
+                    print("Episode: {} | Reward: {} | Polciy Loss: {} | Batches: {}".format(i, eval_reward, policy_loss, batches))
+                if i % config.save_every == 0:
+                    save(config, save_name=f"IQL_buffer_data_{d}train_{t}", model=agent.actor_local)
+            # plot and save plot
+            import matplotlib.pyplot as plt
+            plt.plot(rewards_list)
+            plt.xlabel('Episode')
+            plt.ylabel('Reward')
+            plt.title('Reward over Episodes')
+            plt.savefig(f'plot/reward_plot_data_{d}train_{t}.png')
+            plt.close()
+            plt.plot(policy_losses_list)
+            plt.xlabel('Episode')
+            plt.ylabel('Policy Loss')
+            plt.title('Policy Loss over Episodes')
+            plt.savefig(f'plot/policy_loss_plot_data_{d}train_{t}.png')
+            plt.close()
+            # save the rewards list
+            np.save(f"reward_list/rewards_list_data_{d}train_{t}.npy", rewards_list)
 
 def evaluate_after_train(eval_runs=100):
     env = gym.make("CellworldBotEvade-v0",
@@ -184,7 +257,7 @@ def evaluate_after_train(eval_runs=100):
                 action_size=env.action_space.n,
                 device="cpu")
     agent.actor_local.eval()
-    agent.actor_local.load_state_dict(torch.load("IQL_trained_models/IQL-discreteIQL_400.pth"))
+    agent.actor_local.load_state_dict(torch.load("IQL_trained_models/IQL-discreteIQL_buffer2.pth"))
     for i in range(eval_runs):
         state, _ = env.reset()
         rewards = 0
@@ -247,6 +320,7 @@ def kl_divergence():
 
 if __name__ == "__main__":
     config = get_config()
-    train(config)
+    train_all_data(config, train_times=4, num_data=5)
+    # train_single_data(config, train_times=2)
     # evaluate_after_train()
     # kl_divergence()
