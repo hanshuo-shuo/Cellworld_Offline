@@ -9,7 +9,9 @@ class IQL(nn.Module):
     def __init__(self,
                  state_size,
                  action_size,
-                 device
+                 device,
+                 hidden_size=256,
+                 learning_rate=3e-4,
                  ):
         super(IQL, self).__init__()
         self.state_size = state_size
@@ -17,8 +19,8 @@ class IQL(nn.Module):
         self.device = device
         self.gamma = torch.FloatTensor([0.99]).to(device)
         self.hard_update_every = 10
-        hidden_size = 256
-        learning_rate = 3e-4
+        hidden_size = hidden_size
+        learning_rate = learning_rate
         self.clip_grad_param = 100
         # scales the logits before applying softmax
         self.temperature = torch.FloatTensor([100]).to(device)
