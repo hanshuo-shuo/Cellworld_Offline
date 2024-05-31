@@ -14,3 +14,6 @@ Biased data and augmented data towards all HC region but the first two, has shap
 
 new_data_5.pkl description:
 Biased data and augmented data towards all HC region, has shape of 209680
+
+
+![image](https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/16b2ef3c-8600-4210-a88a-7e2638e48430)
