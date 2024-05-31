@@ -91,4 +91,11 @@ for episode in range(total_episodes):
     offline_rl_agent.train(replay_buffer)
 ```
 
-<img width="800" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/fa531a56-a953-4456-84de-48ea65bb1b21">
+Planner still not ready, and I used a DQN agent with a success rate about 60%.
+
+## expert start
+<img width="815" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/ebb282e6-ec3e-4b24-a3dd-90fa20498ab5">
+
+## random start
+<img width="815" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/3717f1cf-5d33-4998-aacf-0877c3b879bb">
+
