@@ -49,6 +49,13 @@ KL divergence()
 <img width="1000" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/2eec2f26-90d1-41ad-9136-2f519fbcf631">
 
 
+Train for 100 epch, and evaluate for 20 epsolid after each epch:
+
+<img width="1200" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bd556d47-b540-48b4-9b52-4240fe24e226">
+
+After training plot
+
+
 ## Offline RL Implementation with Planner-Greedy Exploration
 
 - There is a planning rate and RL rate. At the starting point, the planning rate is 100% and the RL rate is 0%. 
