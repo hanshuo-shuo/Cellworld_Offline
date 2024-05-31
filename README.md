@@ -53,7 +53,10 @@ Train for 100 epch, and evaluate for 20 epsolid after each epch:
 
 <img width="1200" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bd556d47-b540-48b4-9b52-4240fe24e226">
 
-After training plot
+After training plot:
+
+<img width="1200" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/3306f23f-b254-4dac-9e3d-b35539db5f3a">
+
 
 
 ## Offline RL Implementation with Planner-Greedy Exploration
