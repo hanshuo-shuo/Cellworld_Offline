@@ -90,3 +90,5 @@ for episode in range(total_episodes):
         state = next_state
     offline_rl_agent.train(replay_buffer)
 ```
+
+<img width="800" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/fa531a56-a953-4456-84de-48ea65bb1b21">
