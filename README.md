@@ -11,12 +11,22 @@ We have 100,000:
 
 # BC/ CQL /IQL
 
-evaluate for 100 epches, when captured -1, when success 1
+evaluate for 100 epochs when captured -1, when success 1
+The mean reward can be shown as follows: 
+
 - BC: -17.42
 
 - CQL: -150.08
 
 - IQL: -29.06
+
+
+It seems I have identified an intriguing case where Behavior Cloning (BC) is outperforming other offline RL methods, like CQL and Implicit Q-learning, which are designed to handle suboptimal datasets. This suggests that something unusual may be happening with the offline RL algorithms in your setting, potentially due to issues with how pessimistic they are when evaluating and learning from the dataset.
+
+To investigate this further, comparing the Q-values (which represent the expected future reward from a given state-action pair) between your offline RL policies and a less pessimistic baseline (like BC) could shed light on why this is happening. Here's a detailed plan for how to approach this:
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/f4a43257-6409-43af-8243-e0debb5fe577">
+
 
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/343b4406-f617-4ffd-a1e8-d7892f7fdc38">
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/a107acf6-4fdb-4627-ba8f-2e3f2082e3e8">
@@ -24,6 +34,7 @@ evaluate for 100 epches, when captured -1, when success 1
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/bb9c8853-9610-4bd6-8cc0-fae8bbca7c2f">
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/48a74248-c6a2-4f78-a7a3-8fdeb49ebd97">
 <img width="500" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/43c0821b-4fe4-43b7-94a1-6956ffd70425">
+
 
 
 
