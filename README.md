@@ -76,6 +76,7 @@ After training plot:
 
 
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/698f4675-f686-432a-aa5f-b5e325537ab0">
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/d5700675-cf54-4d89-9dd3-09b4de618540">
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/6f20a855-2ade-452d-8f3b-90e5ba82d956">
 
 
@@ -84,7 +85,6 @@ After training plot:
 
 
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/40fcf0b1-e908-40c9-b1db-84565e60f066">
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/d5700675-cf54-4d89-9dd3-09b4de618540">
 
 
 ## Offline RL Implementation with Planner-Greedy Exploration
