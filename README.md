@@ -88,6 +88,10 @@ After training plot:
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/40fcf0b1-e908-40c9-b1db-84565e60f066">
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/e126c0db-7ab3-421d-9e68-e15ece209c46">
 
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/2f0ffa66-066d-420c-aef9-9fa9335b70ca">
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/8fafcd63-1e95-429e-9233-c866b10f62cc">
+
+
 ## Offline RL Implementation with Planner-Greedy Exploration
 
 - There is a planning rate and RL rate. At the starting point, the planning rate is 100% and the RL rate is 0%. 
