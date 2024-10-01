@@ -68,6 +68,23 @@ After training plot:
 
 <img width="1200" alt="image" src="https://github.com/hanshuo-shuo/Cellworld_Offline/assets/80494218/3306f23f-b254-4dac-9e3d-b35539db5f3a">
 
+## Discrete to continous
+
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/819019a9-5f6f-473e-954d-d833ca98c199">
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/8cd14b4b-5420-4e17-850b-4d3ef126fb7e">
+
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/698f4675-f686-432a-aa5f-b5e325537ab0">
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/6f20a855-2ade-452d-8f3b-90e5ba82d956">
+
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/b57851e9-a226-485d-8906-56cdbd715afa">
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/e126c0db-7ab3-421d-9e68-e15ece209c46">
+
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/40fcf0b1-e908-40c9-b1db-84565e60f066">
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/d5700675-cf54-4d89-9dd3-09b4de618540">
 
 
 ## Offline RL Implementation with Planner-Greedy Exploration
